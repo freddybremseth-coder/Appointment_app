@@ -1,0 +1,125 @@
+/* ------------------------------------------------------------------
+   FreddyBremseth booking — shared styles
+   Visual language: Acuity-style. Off-white canvas, white cards,
+   navy primary, amber accent, soft borders.
+------------------------------------------------------------------ */
+:root {
+  --bg: #F4F6F9;
+  --bg-2: #EEF1F5;
+  --card: #FFFFFF;
+  --ink: #0F1B2D;            /* deep navy headings + buttons */
+  --ink-2: #1F2A3D;
+  --muted: #5B6776;
+  --muted-2: #8B95A3;
+  --line: #E4E8EE;
+  --line-2: #EDF0F4;
+  --accent: #F5A623;         /* amber CTA / paid badge */
+  --accent-ink: #1A1300;
+  --accent-soft: #FEF1DC;
+  --green: #10B981;
+  --green-soft: #DCFCE7;
+  --green-ink: #166534;
+  --pending: #F59E0B;
+  --pending-soft: #FEF3C7;
+  --pending-ink: #92400E;
+  --link: #2563EB;
+  --shadow-sm: 0 1px 2px rgba(15, 27, 45, 0.04);
+  --shadow: 0 1px 3px rgba(15, 27, 45, 0.06), 0 1px 2px rgba(15, 27, 45, 0.04);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+button { font-family: inherit; cursor: pointer; border: 0; background: none; }
+
+/* ---------- shared atoms ---------- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+.card-pad { padding: 22px; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px;
+  font-size: 11.5px; font-weight: 600;
+  border-radius: 999px;
+  background: var(--green-soft); color: var(--green-ink);
+}
+.badge--pending { background: var(--pending-soft); color: var(--pending-ink); }
+
+/* generic icon container */
+.icn {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: 0 0 auto;
+}
+.icn--ink { background: var(--ink); color: #fff; }
+.icn--amber { background: var(--accent); color: var(--accent-ink); }
+.icn--soft { background: var(--bg-2); color: var(--ink); }
+.icn--leaf { background: #166534; color: #DCFCE7; }
+.icn--violet { background: #5B21B6; color: #F5F3FF; }
+.icn--blue { background: #1E3A8A; color: #DBEAFE; }
+
+/* primary CTA — amber */
+.btn-primary {
+  width: 100%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  letter-spacing: -0.01em;
+  transition: filter 120ms ease;
+}
+.btn-primary:hover { filter: brightness(0.97); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-ink {
+  background: var(--ink); color: #fff;
+  font-weight: 600; font-size: 13px;
+  padding: 10px 16px; border-radius: 8px;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-ink:hover { background: #1a2740; }
+
+.btn-ghost {
+  background: var(--card); color: var(--ink);
+  border: 1px solid var(--line);
+  font-weight: 500; font-size: 13px;
+  padding: 8px 14px; border-radius: 8px;
+}
+.btn-ghost:hover { background: var(--bg); }
+
+/* link-style action */
+.link-action {
+  color: var(--link); font-weight: 500; font-size: 13px;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.link-action:hover { text-decoration: underline; }
+
+/* labels */
+.eyebrow {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.h-section { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }

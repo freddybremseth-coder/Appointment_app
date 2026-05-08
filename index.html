@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Freddy Bremseth · Booking-prototyper</title>
+<link rel="icon" href="data:,"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+.wrap { max-width: 880px; margin: 0 auto; padding: 64px 24px; }
+.hero h1 { font-size: 32px; letter-spacing: -0.02em; margin: 8px 0; }
+.hero p { font-size: 15px; color: var(--muted); max-width: 520px; line-height: 1.55; }
+.cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 32px; }
+.tile { display: block; padding: 24px; text-decoration: none; color: var(--ink); transition: border-color 120ms ease, transform 120ms ease; }
+.tile:hover { border-color: var(--ink); text-decoration: none; transform: translateY(-1px); }
+.tile-eyebrow { font-size: 11px; font-weight: 600; color: var(--muted-2); text-transform: uppercase; letter-spacing: 0.08em; }
+.tile-title { font-size: 20px; font-weight: 700; letter-spacing: -0.015em; margin: 6px 0 6px; }
+.tile-sub { font-size: 13.5px; color: var(--muted); line-height: 1.55; }
+.tile-foot { margin-top: 18px; font-size: 13px; color: var(--link); font-weight: 500; }
+.tile-mark { width: 44px; height: 44px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; }
+.t-ink { background: var(--ink); color: #fff; }
+.t-amber { background: var(--accent); color: var(--accent-ink); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <span class="eyebrow">Prototype · Booking-app</span>
+    <h1>Freddy Bremseth — Booking</h1>
+    <p>Booking-prototype for ZenEcoHomes.com, ChatGenius.pro og FreddyBremseth.com. Adminflaten er strukturert slik at den senere kan ligge som eget punkt i Realtyflow CRM.</p>
+  </div>
+  <div class="cards">
+    <a class="tile card" href="zenecohomes.html">
+      <span class="tile-mark t-ink">Z</span>
+      <div class="tile-eyebrow">ZenEcoHomes.com</div>
+      <div class="tile-title">Bolig i Spania</div>
+      <div class="tile-sub">Gratis første boligsamtale om område, budsjett, boligtype og muligheter på Costa Blanca.</div>
+      <div class="tile-foot">Åpne ZenEcoHomes booking →</div>
+    </a>
+    <a class="tile card" href="chatgenius.html">
+      <span class="tile-mark t-amber">C</span>
+      <div class="tile-eyebrow">ChatGenius.pro</div>
+      <div class="tile-title">AI og salg</div>
+      <div class="tile-sub">Gratis AI-mulighetssamtale for bedrifter som vil forbedre leads, oppfølging og kundedialog.</div>
+      <div class="tile-foot">Åpne ChatGenius booking →</div>
+    </a>
+    <a class="tile card" href="pinosoecolife.html">
+      <span class="tile-mark t-ink">P</span>
+      <div class="tile-eyebrow">PinosoEcoLife.com</div>
+      <div class="tile-title">Pinoso og innlandet</div>
+      <div class="tile-sub">Gratis boligsamtale for dem som vurderer Pinoso, tomt, nybygg, villa eller roligere liv i innlandet.</div>
+      <div class="tile-foot">Åpne PinosoEcoLife booking →</div>
+    </a>
+    <a class="tile card" href="booking.html">
+      <span class="tile-mark t-ink">B</span>
+      <div class="tile-eyebrow">FreddyBremseth.com</div>
+      <div class="tile-title">Rådgivning med Freddy</div>
+      <div class="tile-sub">To valg: uavhengig boligrådgivning i Spania eller strategisamtale for gründere og bedrifter.</div>
+      <div class="tile-foot">Åpne Freddy booking →</div>
+    </a>
+    <a class="tile card" href="admin.html">
+      <span class="tile-mark t-amber">A</span>
+      <div class="tile-eyebrow">Realtyflow CRM-modul</div>
+      <div class="tile-title">Booking-admin</div>
+      <div class="tile-sub">Adminflate for merkevarer, bookingtyper, tilgjengelighet, bookinger, betalinger og analyse.</div>
+      <div class="tile-foot">Åpne admin.html →</div>
+    </a>
+  </div>
+</div>
+</body>
+</html>
