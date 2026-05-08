@@ -24,6 +24,14 @@ function getRemoteConfigUrl() {
   return params.get("configUrl") || "";
 }
 
+function getAvailabilityUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const explicit = params.get("availabilityUrl");
+  if (explicit) return explicit;
+  const configUrl = getRemoteConfigUrl();
+  return configUrl ? configUrl.replace("/booking-config", "/booking-availability").split("?")[0] : "";
+}
+
 function buildMonth(year, month) {
   const first = new Date(year, month, 1);
   const startDow = (first.getDay() + 6) % 7;
@@ -40,6 +48,41 @@ function addMinutes(time, minutes) {
   const [h, m] = time.split(":").map(Number);
   const total = h * 60 + m + minutes;
   return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
+
+function timeToMinutes(time) {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
+}
+
+function selectedDateToRange(selected) {
+  if (!selected) return null;
+  const start = new Date(selected.y, selected.m, selected.d, 0, 0, 0);
+  const end = new Date(selected.y, selected.m, selected.d, 23, 59, 59);
+  return { start: start.toISOString(), end: end.toISOString() };
+}
+
+function busyToMinutesForDate(item, selected) {
+  const start = new Date(item.start);
+  const end = new Date(item.end);
+  const dayStart = new Date(selected.y, selected.m, selected.d, 0, 0, 0);
+  const dayEnd = new Date(selected.y, selected.m, selected.d, 23, 59, 59);
+  const clippedStart = Math.max(start.getTime(), dayStart.getTime());
+  const clippedEnd = Math.min(end.getTime(), dayEnd.getTime());
+  if (clippedEnd <= clippedStart) return null;
+  const s = new Date(clippedStart);
+  const e = new Date(clippedEnd);
+  return { start: s.getHours() * 60 + s.getMinutes(), end: e.getHours() * 60 + e.getMinutes() };
+}
+
+function isTimeBlocked(time, duration, busy, selected) {
+  if (!selected || !busy?.length) return false;
+  const start = timeToMinutes(time);
+  const end = start + duration;
+  return busy
+    .map(item => busyToMinutesForDate(item, selected))
+    .filter(Boolean)
+    .some(item => start < item.end && end > item.start);
 }
 
 function fieldIsFilled(value) {
@@ -196,17 +239,18 @@ function MiniCal({ year, month, selected, onPick, onMonth }) {
   );
 }
 
-function TimeList({ selected, onPick, dateLabel }) {
+function TimeList({ selected, onPick, dateLabel, times, loading }) {
   return (
     <div className="time-wrap">
       <div className="time-head">
         <div className="h-section">3. Velg et tidspunkt</div>
-        <div className="time-sub">{dateLabel}</div>
+        <div className="time-sub">{loading ? "Sjekker kalender..." : dateLabel}</div>
       </div>
       <div className="time-list">
-        {[...TIMES_AM, ...TIMES_PM].map(t => (
+        {times.map(t => (
           <button key={t} className={`time-btn ${selected === t ? "is-sel" : ""}`} onClick={() => onPick(t)}>{t}</button>
         ))}
+        {!loading && times.length === 0 && <div className="time-empty">Ingen ledige tider denne dagen.</div>}
       </div>
       <a href="#" className="link-action time-more">Vis flere tider</a>
     </div>
@@ -374,6 +418,8 @@ function BookingApp() {
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [booking, setBooking] = useState(null);
+  const [busySlots, setBusySlots] = useState([]);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
   useEffect(() => {
     const configUrl = getRemoteConfigUrl();
@@ -399,6 +445,11 @@ function BookingApp() {
   }, []);
 
   const service = brand.services.find(s => s.id === serviceId) || brand.services[0];
+  const availabilityUrl = getAvailabilityUrl();
+  const availableTimes = useMemo(() => {
+    const allTimes = [...TIMES_AM, ...TIMES_PM];
+    return allTimes.filter(t => !isTimeBlocked(t, service.duration, busySlots, date));
+  }, [busySlots, date, service.duration]);
   const dateLabel = date
     ? `${["søndag","mandag","tirsdag","onsdag","torsdag","fredag","lørdag"][new Date(date.y, date.m, date.d).getDay()]} ${date.d}. ${MONTHS_NO[date.m]} ${date.y}`
     : "";
@@ -410,6 +461,33 @@ function BookingApp() {
     const total = p.y * 12 + p.m + delta;
     return { y: Math.floor(total / 12), m: total % 12 };
   });
+
+  useEffect(() => {
+    if (!availabilityUrl || !date) {
+      setBusySlots([]);
+      return;
+    }
+    const range = selectedDateToRange(date);
+    if (!range) return;
+    const controller = new AbortController();
+    const url = new URL(availabilityUrl);
+    url.searchParams.set("start", range.start);
+    url.searchParams.set("end", range.end);
+    url.searchParams.set("buffer", "30");
+    setAvailabilityLoading(true);
+    fetch(url.toString(), { signal: controller.signal })
+      .then(res => res.ok ? res.json() : { busy: [] })
+      .then(data => setBusySlots(Array.isArray(data.busy) ? data.busy : []))
+      .catch(() => setBusySlots([]))
+      .finally(() => setAvailabilityLoading(false));
+    return () => controller.abort();
+  }, [availabilityUrl, date]);
+
+  useEffect(() => {
+    if (time && !availableTimes.includes(time)) {
+      setTime(availableTimes[0] || "");
+    }
+  }, [availableTimes, time]);
 
   const selectService = (id) => {
     setServiceId(id);
@@ -463,7 +541,7 @@ function BookingApp() {
               </div>
             </section>
             <section className="sec sec-time">
-              <TimeList selected={time} onPick={setTime} dateLabel={dateLabel}/>
+              <TimeList selected={time} onPick={setTime} dateLabel={dateLabel} times={availableTimes} loading={availabilityLoading}/>
             </section>
           </div>
 

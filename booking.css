@@ -285,6 +285,15 @@
 }
 .time-btn:hover { border-color: var(--ink-2); }
 .time-btn.is-sel { background: var(--ink); border-color: var(--ink); color: #fff; }
+.time-empty {
+  grid-column: 1 / -1;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
 .time-more { display: inline-block; margin-top: 10px; font-size: 12.5px; }
 
 /* Selected summary */
