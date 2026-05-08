@@ -78,6 +78,20 @@
 .booking-hero {
   padding-bottom: 4px;
 }
+.remote-note {
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg-2);
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.remote-note--error {
+  border-color: #FCA5A5;
+  background: #FEF2F2;
+  color: #991B1B;
+}
 .booking-hero h1 {
   margin: 8px 0 8px;
   font-size: 30px;

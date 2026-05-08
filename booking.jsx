@@ -1,5 +1,5 @@
 /* global React, ReactDOM, Icon, BOOKING_BRANDS, BOOKING_DEFAULT_BRAND, BookingStore */
-const { useState, useMemo } = React;
+const { useEffect, useState, useMemo } = React;
 
 const MONTHS_NO = ["januar","februar","mars","april","mai","juni","juli","august","september","oktober","november","desember"];
 const DOW_NO = ["man","tir","ons","tor","fre","lør","søn"];
@@ -17,6 +17,11 @@ function getInitialService(brand) {
   const params = new URLSearchParams(window.location.search);
   const fromQuery = params.get("service");
   return brand.services.find(s => s.id === fromQuery) || brand.services[0];
+}
+
+function getRemoteConfigUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("configUrl") || "";
 }
 
 function buildMonth(year, month) {
@@ -356,7 +361,8 @@ function Confirmation({ brand, service, dateLabel, time, contact, booking }) {
 }
 
 function BookingApp() {
-  const brand = getInitialBrand();
+  const [brand, setBrand] = useState(getInitialBrand);
+  const [remoteStatus, setRemoteStatus] = useState("idle");
   document.body.dataset.brand = brand.id;
 
   const initialService = getInitialService(brand);
@@ -368,6 +374,29 @@ function BookingApp() {
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [booking, setBooking] = useState(null);
+
+  useEffect(() => {
+    const configUrl = getRemoteConfigUrl();
+    if (!configUrl) return;
+    let cancelled = false;
+    setRemoteStatus("loading");
+    fetch(configUrl)
+      .then((response) => response.json())
+      .then((payload) => {
+        if (cancelled || !payload?.config?.services?.length) return;
+        setBrand(payload.config);
+        setServiceId(payload.config.services[0].id);
+        setAnswers({});
+        setSubmitted(false);
+        setBooking(null);
+        setRemoteStatus("ready");
+      })
+      .catch((error) => {
+        console.warn("Could not load remote booking config", error);
+        if (!cancelled) setRemoteStatus("error");
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   const service = brand.services.find(s => s.id === serviceId) || brand.services[0];
   const dateLabel = date
@@ -414,6 +443,8 @@ function BookingApp() {
       <main className="main">
         <div className="main-card card">
           <Stepper step={stepNum}/>
+          {remoteStatus === "loading" && <div className="remote-note">Henter publisert bookingoppsett fra Realtyflow...</div>}
+          {remoteStatus === "error" && <div className="remote-note remote-note--error">Kunne ikke hente publisert bookingoppsett. Viser lokal standard.</div>}
           <PageIntro brand={brand}/>
 
           <section className="sec">
