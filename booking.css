@@ -447,6 +447,36 @@
 .payment-note {
   font-weight: 600;
 }
+.confirmed-next {
+  margin-top: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-color: #D7E2EE;
+  background: #F8FAFC;
+}
+.confirmed-next strong {
+  display: block;
+  color: var(--ink);
+  font-size: 14px;
+}
+.confirmed-next p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.confirmed-pill {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #DCFCE7;
+  color: var(--green-ink);
+  font-size: 12px;
+  font-weight: 700;
+}
 .cross-links {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

@@ -433,6 +433,22 @@ function Confirmation({ brand, service, dateLabel, time, contact, booking }) {
   );
 }
 
+function ConfirmedNextStep({ service }) {
+  return (
+    <div className="confirmed-next card">
+      <div>
+        <strong>Møtet er registrert.</strong>
+        <p>Du trenger ikke trykke på bookingknappen igjen. Vi sender detaljene videre til CRM og følger opp møtet derfra.</p>
+      </div>
+      {service.paid ? (
+        <span className="confirmed-pill">Betaling følges opp</span>
+      ) : (
+        <span className="confirmed-pill">Ferdig booket</span>
+      )}
+    </div>
+  );
+}
+
 function BookingApp() {
   const [brand, setBrand] = useState(getInitialBrand);
   const [remoteStatus, setRemoteStatus] = useState("idle");
@@ -629,7 +645,7 @@ function BookingApp() {
   };
 
   const submitBooking = () => {
-    if (!detailsReady) return;
+    if (!detailsReady || submitted) return;
     const saved = BookingStore.create({
       brandId: brand.id,
       brandName: brand.siteName,
@@ -681,16 +697,23 @@ function BookingApp() {
           <SelectedCard service={service} dateLabel={dateLabel} time={time}/>
           <IntakeForm service={service} contact={contact} setContact={setContact} answers={answers} setAnswers={setAnswers}/>
 
-          {submitted && <Confirmation brand={brand} service={service} dateLabel={dateLabel} time={time} contact={contact} booking={booking}/>}
+          {submitted ? (
+            <>
+              <Confirmation brand={brand} service={service} dateLabel={dateLabel} time={time} contact={contact} booking={booking}/>
+              <ConfirmedNextStep service={service}/>
+            </>
+          ) : (
+            <>
+              <div className="legal">
+                <span className="lock">Sikkerhet</span>
+                Ved å fortsette godtar du våre <a href="#">personvernvilkår</a> og <a href="#">brukervilkår</a>.
+              </div>
 
-          <div className="legal">
-            <span className="lock">Sikkerhet</span>
-            Ved å fortsette godtar du våre <a href="#">personvernvilkår</a> og <a href="#">brukervilkår</a>.
-          </div>
-
-          <button className="btn-primary" disabled={!detailsReady} onClick={submitBooking}>
-            {service.cta}
-          </button>
+              <button className="btn-primary" disabled={!detailsReady} onClick={submitBooking}>
+                {service.cta}
+              </button>
+            </>
+          )}
 
           <div className="reschedule">
             <Icon.Clock/>
