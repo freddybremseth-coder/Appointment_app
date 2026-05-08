@@ -1,5 +1,5 @@
 /* global React, ReactDOM, Icon, BOOKING_BRANDS, BOOKING_DEFAULT_BRAND, BookingStore */
-const { useEffect, useState, useMemo } = React;
+const { useEffect, useState, useMemo, useRef } = React;
 
 const MONTHS_NO = ["januar","februar","mars","april","mai","juni","juli","august","september","oktober","november","desember"];
 const DOW_NO = ["man","tir","ons","tor","fre","lør","søn"];
@@ -85,11 +85,38 @@ function isTimeBlocked(time, duration, busy, selected) {
     .some(item => start < item.end && end > item.start);
 }
 
+function decodeJwtPayload(token) {
+  try {
+    const payload = token.split(".")[1];
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const json = decodeURIComponent(atob(base64).split("").map(c => `%${(`00${c.charCodeAt(0).toString(16)}`).slice(-2)}`).join(""));
+    return JSON.parse(json);
+  } catch (error) {
+    console.warn("Could not decode Google credential", error);
+    return null;
+  }
+}
+
+function loadGoogleIdentityScript() {
+  if (window.google?.accounts?.id) return Promise.resolve();
+  if (window.__googleIdentityPromise) return window.__googleIdentityPromise;
+  window.__googleIdentityPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = resolve;
+    script.onerror = () => reject(new Error("Kunne ikke laste Google innlogging"));
+    document.head.appendChild(script);
+  });
+  return window.__googleIdentityPromise;
+}
+
 function fieldIsFilled(value) {
   return Array.isArray(value) ? value.length > 0 : Boolean(String(value || "").trim());
 }
 
-function ProfileSidebar({ brand }) {
+function ProfileSidebar({ brand, googleUser, googleStatus, onGoogleLogin }) {
   return (
     <aside className="sidebar">
       <div className="card card-pad profile-card">
@@ -109,11 +136,13 @@ function ProfileSidebar({ brand }) {
       </div>
 
       <div className="card card-pad google-card">
-        <button className="google-btn">
+        <button className="google-btn" onClick={onGoogleLogin} type="button">
           <Icon.Google/>
-          <span>Logg inn med Google</span>
+          <span>{googleUser ? `Innlogget som ${googleUser.name}` : "Logg inn med Google"}</span>
         </button>
-        <div className="google-sub">for å autofylle dine opplysninger</div>
+        <div className={`google-sub ${googleStatus?.type === "error" ? "google-sub--error" : ""}`}>
+          {googleStatus?.message || (googleUser ? googleUser.email : "for å autofylle dine opplysninger")}
+        </div>
       </div>
 
       <div className="card card-pad gcal-card">
@@ -420,6 +449,10 @@ function BookingApp() {
   const [booking, setBooking] = useState(null);
   const [busySlots, setBusySlots] = useState([]);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [googleStatus, setGoogleStatus] = useState({ type: "idle", message: "" });
+  const [googleUser, setGoogleUser] = useState(null);
+  const [googleCredential, setGoogleCredential] = useState("");
+  const googleTokenClient = useRef(null);
 
   useEffect(() => {
     const configUrl = getRemoteConfigUrl();
@@ -441,6 +474,89 @@ function BookingApp() {
         console.warn("Could not load remote booking config", error);
         if (!cancelled) setRemoteStatus("error");
       });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    const clientId = String(window.GOOGLE_CLIENT_ID || "").trim();
+    if (!clientId) {
+      setGoogleStatus({ type: "error", message: "Google Client ID mangler." });
+      return;
+    }
+    if (window.location.protocol === "file:") {
+      setGoogleStatus({ type: "error", message: "Google innlogging virker på publisert https-side, ikke lokal filvisning." });
+      return;
+    }
+
+    let cancelled = false;
+    loadGoogleIdentityScript()
+      .then(() => {
+        if (cancelled || !window.google?.accounts) return;
+        if (window.google.accounts.id) {
+          window.google.accounts.id.initialize({
+            client_id: clientId,
+            callback: (response) => {
+              const profile = decodeJwtPayload(response.credential);
+              if (!profile?.email) {
+                setGoogleStatus({ type: "error", message: "Google returnerte ikke e-post." });
+                return;
+              }
+              const user = {
+                name: profile.name || [profile.given_name, profile.family_name].filter(Boolean).join(" ") || profile.email,
+                email: profile.email,
+                picture: profile.picture || "",
+                sub: profile.sub || "",
+              };
+              setGoogleCredential(response.credential || "");
+              setGoogleUser(user);
+              setContact((current) => ({
+                ...current,
+                name: current.name || user.name,
+                email: current.email || user.email,
+              }));
+              setGoogleStatus({ type: "ready", message: "Google fylte inn navn og e-post." });
+            },
+            ux_mode: "popup",
+          });
+        }
+        if (window.google.accounts.oauth2) {
+          googleTokenClient.current = window.google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: "openid email profile",
+            callback: async (response) => {
+              if (response.error) {
+                setGoogleStatus({ type: "error", message: "Google innlogging ble avbrutt." });
+                return;
+              }
+              try {
+                const profile = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+                  headers: { Authorization: `Bearer ${response.access_token}` },
+                }).then((res) => res.json());
+                if (!profile?.email) throw new Error("No email");
+                const user = {
+                  name: profile.name || [profile.given_name, profile.family_name].filter(Boolean).join(" ") || profile.email,
+                  email: profile.email,
+                  picture: profile.picture || "",
+                  sub: profile.sub || "",
+                };
+                setGoogleCredential(response.access_token || "");
+                setGoogleUser(user);
+                setContact((current) => ({
+                  ...current,
+                  name: current.name || user.name,
+                  email: current.email || user.email,
+                }));
+                setGoogleStatus({ type: "ready", message: "Google fylte inn navn og e-post." });
+              } catch {
+                setGoogleStatus({ type: "error", message: "Kunne ikke hente profil fra Google." });
+              }
+            },
+          });
+        }
+        setGoogleStatus({ type: "ready", message: "" });
+      })
+      .catch(() => setGoogleStatus({ type: "error", message: "Kunne ikke laste Google innlogging." }));
+
     return () => { cancelled = true; };
   }, []);
 
@@ -496,6 +612,22 @@ function BookingApp() {
     setBooking(null);
   };
 
+  const signInWithGoogle = () => {
+    if (window.location.protocol === "file:") {
+      setGoogleStatus({ type: "error", message: "Åpne den publiserte https-siden for Google innlogging." });
+      return;
+    }
+    if (!window.google?.accounts) {
+      setGoogleStatus({ type: "error", message: "Google innlogging er ikke ferdig lastet. Prøv igjen om et sekund." });
+      return;
+    }
+    if (googleTokenClient.current) {
+      googleTokenClient.current.requestAccessToken({ prompt: "select_account" });
+      return;
+    }
+    window.google.accounts.id.prompt();
+  };
+
   const submitBooking = () => {
     if (!detailsReady) return;
     const saved = BookingStore.create({
@@ -509,6 +641,7 @@ function BookingApp() {
       price: service.price,
       paid: service.paid,
       contact,
+      googleAuth: googleUser ? { user: googleUser, token: googleCredential } : null,
       answers,
     });
     setBooking(saved);
@@ -517,7 +650,7 @@ function BookingApp() {
 
   return (
     <div className="page">
-      <ProfileSidebar brand={brand}/>
+      <ProfileSidebar brand={brand} googleUser={googleUser} googleStatus={googleStatus} onGoogleLogin={signInWithGoogle}/>
       <main className="main">
         <div className="main-card card">
           <Stepper step={stepNum}/>
