@@ -2,3 +2,4 @@
 node_modules/
 _check_*.jpg
 _check_*.png
+.vercel
