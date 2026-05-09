@@ -9,12 +9,13 @@ window.BOOKING_BRANDS = {
     domain: "ZenEcoHomes.com",
     siteName: "ZenEcoHomes",
     bookingUrl: "zenecohomes.com/book",
+    logoUrl: "https://realtyflow.chatgenius.pro/brand-logos/zeneco.png",
     accent: "leaf",
     profile: {
       name: "ZenEcoHomes",
       initials: "ZE",
       role: "Bolig i Spania",
-      location: "Costa Blanca · Pinoso · Aspe · Novelda",
+      location: "Costa Blanca",
       tz: "Europa/Madrid (CET)",
       bio: "Jeg hjelper deg å finne og kjøpe riktig bolig i Spania.",
     },
@@ -46,7 +47,7 @@ window.BOOKING_BRANDS = {
         intakeTitle: "Hjelp oss forberede boligsamtalen",
         intakeFields: [
           { type: "radio-grid", id: "propertyGoal", label: "Hva vurderer du?", options: ["Feriebolig","Fast bolig","Investering","Nybygg","Tomt","Usikker"], required: true },
-          { type: "select", id: "area", label: "Hvilket område vurderer du?", options: ["Costa Blanca Nord","Costa Blanca Sør","Pinoso / Aspe / Novelda","Altea / Albir / Benidorm","Calpe / Jávea / Moraira","Vet ikke ennå"], required: true },
+          { type: "select", id: "area", label: "Hvilket område vurderer du?", options: ["Costa Blanca","Costa Blanca Nord","Costa Blanca Sør","Altea / Albir / Benidorm","Calpe / Jávea / Moraira","Vet ikke ennå"], required: true },
           { type: "select", id: "budget", label: "Omtrentlig budsjett?", options: ["Under €200.000","€200.000–€350.000","€350.000–€500.000","€500.000–€800.000","Over €800.000"], required: true },
           { type: "select", id: "timing", label: "Når ønsker du å kjøpe?", options: ["Innen 3 måneder","3–6 måneder","6–12 måneder","1–2 år","Bare undersøker"], required: true },
           { type: "radio-grid", id: "financing", label: "Har du finansiering på plass?", options: ["Ja","Delvis","Nei","Usikker"], required: true },
@@ -65,6 +66,7 @@ window.BOOKING_BRANDS = {
     domain: "PinosoEcoLife.com",
     siteName: "PinosoEcoLife",
     bookingUrl: "pinosoecolife.com/book",
+    logoUrl: "",
     accent: "blue",
     profile: {
       name: "PinosoEcoLife",
@@ -122,6 +124,7 @@ window.BOOKING_BRANDS = {
     domain: "FreddyBremseth.com",
     siteName: "Freddy Bremseth",
     bookingUrl: "freddybremseth.com/book",
+    logoUrl: "",
     accent: "amber",
     profile: {
       name: "Freddy Bremseth",
@@ -203,6 +206,7 @@ window.BOOKING_BRANDS = {
     domain: "ChatGenius.pro",
     siteName: "ChatGenius",
     bookingUrl: "chatgenius.pro/book",
+    logoUrl: "",
     accent: "violet",
     profile: {
       name: "ChatGenius.pro",

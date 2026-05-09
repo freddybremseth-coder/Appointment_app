@@ -120,7 +120,11 @@ function ProfileSidebar({ brand, googleUser, googleStatus, onGoogleLogin }) {
   return (
     <aside className="sidebar">
       <div className="card card-pad profile-card">
-        <div className={`avatar avatar--${brand.accent}`}>{brand.profile.initials}</div>
+        {brand.logoUrl ? (
+          <img className="brand-logo" src={brand.logoUrl} alt={`${brand.siteName} logo`} />
+        ) : (
+          <div className={`avatar avatar--${brand.accent}`}>{brand.profile.initials}</div>
+        )}
         <div className="profile-name">{brand.profile.name}</div>
         <div className="profile-role">{brand.profile.role}</div>
         <div className="profile-socials">
@@ -391,6 +395,10 @@ function IntakeForm({ service, contact, setContact, answers, setAnswers }) {
           <span>E-post<b>*</b></span>
           <input type="email" value={contact.email} onChange={e => setContact(p => ({ ...p, email: e.target.value }))} placeholder="din@epost.no"/>
         </label>
+        <label className="form-field">
+          <span>Telefonnummer<b>*</b></span>
+          <input type="tel" value={contact.phone || ""} onChange={e => setContact(p => ({ ...p, phone: e.target.value }))} placeholder="+47 000 00 000"/>
+        </label>
       </div>
       <div className="intake-grid">
         {service.intakeFields.map(field => (
@@ -459,7 +467,7 @@ function BookingApp() {
   const [date, setDate] = useState({ d: 13, m: 4, y: 2026 });
   const [time, setTime] = useState("10:00");
   const [calMonth, setCalMonth] = useState({ m: 4, y: 2026 });
-  const [contact, setContact] = useState({ name: "", email: "" });
+  const [contact, setContact] = useState({ name: "", email: "", phone: "" });
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [booking, setBooking] = useState(null);
@@ -586,7 +594,7 @@ function BookingApp() {
     ? `${["søndag","mandag","tirsdag","onsdag","torsdag","fredag","lørdag"][new Date(date.y, date.m, date.d).getDay()]} ${date.d}. ${MONTHS_NO[date.m]} ${date.y}`
     : "";
   const requiredFields = service.intakeFields.filter(f => f.required);
-  const detailsReady = fieldIsFilled(contact.name) && fieldIsFilled(contact.email) && requiredFields.every(f => fieldIsFilled(answers[f.id]));
+  const detailsReady = fieldIsFilled(contact.name) && fieldIsFilled(contact.email) && fieldIsFilled(contact.phone) && requiredFields.every(f => fieldIsFilled(answers[f.id]));
   const stepNum = submitted ? 4 : !serviceId ? 1 : !date || !time ? 2 : !detailsReady ? 3 : 4;
 
   const monthShift = (delta) => setCalMonth(p => {
