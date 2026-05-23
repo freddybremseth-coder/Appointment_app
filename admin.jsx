@@ -15,6 +15,8 @@ const EVENT_TYPES = [
   { id: "pinoso-first-call",     icon: "Home",      iconStyle: "ink",   title: "Første boligsamtale Pinoso", sub: "PinosoEcoLife",     duration: "30 min", price: "Gratis", paid: false, active: true, color: "#1E3A8A" },
   { id: "freddy-property-advice",icon: "Compass",   iconStyle: "amber", title: "Uavhengig boligrådgivning",  sub: "FreddyBremseth",    duration: "60 min", price: "€195",   paid: true,  active: true, color: "#F5A623" },
   { id: "chat-ai-opportunity",   icon: "Spark",     iconStyle: "ink",   title: "AI-mulighetssamtale",        sub: "ChatGenius",        duration: "30 min", price: "Gratis", paid: false, active: true, color: "#5B21B6" },
+  { id: "chat-funnel-review",    icon: "Spark",     iconStyle: "ink",   title: "AI og salgsfunnel",          sub: "ChatGenius",        duration: "60 min", price: "€195",   paid: true,  active: true, color: "#5B21B6" },
+  { id: "chat-chatbot-workshop", icon: "Briefcase", iconStyle: "ink",   title: "Chatbot workshop",           sub: "ChatGenius",        duration: "60 min", price: "€195",   paid: true,  active: true, color: "#5B21B6" },
   { id: "freddy-strategy",       icon: "Briefcase", iconStyle: "amber", title: "Strategisamtale",            sub: "FreddyBremseth",    duration: "60 min", price: "€195",   paid: true,  active: true, color: "#F5A623" },
 ];
 
@@ -24,7 +26,9 @@ const BOOKINGS = [
   { date: "13. mai · 10:30", type: "Første Pinoso-samtale", customer: "Anne Vik",            status: "confirmed", price: "Gratis", paid: false },
   { date: "13. mai · 11:30", type: "Uavhengig boligråd",    customer: "Marit Dahl",          status: "confirmed", price: "€195",   paid: true  },
   { date: "13. mai · 14:00", type: "AI-mulighetssamtale",   customer: "Roar Andersen",       status: "confirmed", price: "Gratis", paid: false },
+  { date: "14. mai · 09:00", type: "AI og salgsfunnel",      customer: "Nordic Growth AS",    status: "pending",   price: "€195",   paid: true  },
   { date: "14. mai · 10:00", type: "Strategisamtale",       customer: "Camilla Bjørnerud",   status: "pending",   price: "€195",   paid: true  },
+  { date: "14. mai · 13:00", type: "Chatbot workshop",       customer: "Service Partner AS",  status: "confirmed", price: "€195",   paid: true  },
   { date: "14. mai · 15:30", type: "Første boligsamtale",   customer: "Tom Eriksen",         status: "confirmed", price: "Gratis", paid: false },
   { date: "15. mai · 09:30", type: "Uavhengig boligråd",    customer: "Hanne Solberg",       status: "confirmed", price: "€195",   paid: true  },
   { date: "15. mai · 13:00", type: "AI-mulighetssamtale",   customer: "Tech Nordic AS",      status: "pending",   price: "Gratis", paid: false },

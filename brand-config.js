@@ -3,6 +3,17 @@
    Realtyflow CRM module. Booking pages should read from this structure
    instead of hardcoding services, copy, and intake forms.
 ==================================================================== */
+const CHATGENIUS_AI_FIELDS = [
+  { type: "text", id: "companyType", label: "Hva slags bedrift har du?", placeholder: "F.eks. eiendom, konsulent, håndverker, B2B, nettbutikk..." },
+  { type: "checkbox-grid", id: "needs", label: "Hva ønsker du hjelp med?", options: ["Flere leads","Bedre møtebooking","Chatbot","Automatisert oppfølging","Kundeservice","Salgsprosess","Innholdsproduksjon","CRM / systemflyt","Vet ikke ennå"], required: true },
+  { type: "radio-grid", id: "hasWebsite", label: "Har du nettside?", options: ["Ja","Nei","Under utvikling"], required: true },
+  { type: "url", id: "website", label: "Link til nettside.", placeholder: "https://" },
+  { type: "checkbox-grid", id: "customerChannels", label: "Hvordan får du kunder i dag?", options: ["Nettverk","Annonser","Telefon","E-post","Sosiale medier","Google","Anbefalinger","Annet"] },
+  { type: "radio-grid", id: "challenge", label: "Hva er største utfordring akkurat nå?", options: ["For få leads","Dårlig oppfølging","For mye manuelt arbeid","Lav konvertering","Lite tid","Utydelig tilbud","Vet ikke"], required: true },
+  { type: "text", id: "crm", label: "Bruker du CRM eller e-postsystem i dag?", placeholder: "F.eks. HubSpot, Pipedrive, Mailchimp, ingen..." },
+  { type: "textarea", id: "aiGoal", label: "Hva ønsker du at AI skal hjelpe deg med?", placeholder: "Beskriv prosessen, målet eller ideen du vil utforske." },
+];
+
 window.BOOKING_BRANDS = {
   zen: {
     id: "zen",
@@ -242,16 +253,41 @@ window.BOOKING_BRANDS = {
         blurb: "En uforpliktende samtale der vi kartlegger hvordan AI kan hjelpe bedriften din med salg, kundedialog, oppfølging eller automatisering.",
         cta: "Book gratis AI-samtale",
         intakeTitle: "Skjema før AI-samtale",
-        intakeFields: [
-          { type: "text", id: "companyType", label: "Hva slags bedrift har du?", placeholder: "F.eks. eiendom, konsulent, håndverker, B2B, nettbutikk..." },
-          { type: "checkbox-grid", id: "needs", label: "Hva ønsker du hjelp med?", options: ["Flere leads","Bedre møtebooking","Chatbot","Automatisert oppfølging","Kundeservice","Salgsprosess","Innholdsproduksjon","CRM / systemflyt","Vet ikke ennå"], required: true },
-          { type: "radio-grid", id: "hasWebsite", label: "Har du nettside?", options: ["Ja","Nei","Under utvikling"], required: true },
-          { type: "url", id: "website", label: "Link til nettside.", placeholder: "https://" },
-          { type: "checkbox-grid", id: "customerChannels", label: "Hvordan får du kunder i dag?", options: ["Nettverk","Annonser","Telefon","E-post","Sosiale medier","Google","Anbefalinger","Annet"] },
-          { type: "radio-grid", id: "challenge", label: "Hva er største utfordring akkurat nå?", options: ["For få leads","Dårlig oppfølging","For mye manuelt arbeid","Lav konvertering","Lite tid","Utydelig tilbud","Vet ikke"], required: true },
-          { type: "text", id: "crm", label: "Bruker du CRM eller e-postsystem i dag?", placeholder: "F.eks. HubSpot, Pipedrive, Mailchimp, ingen..." },
-          { type: "textarea", id: "aiGoal", label: "Hva ønsker du at AI skal hjelpe deg med?", placeholder: "Beskriv prosessen, målet eller ideen du vil utforske." },
-        ],
+        intakeFields: CHATGENIUS_AI_FIELDS,
+      },
+      {
+        id: "chat-funnel-review",
+        icon: "Spark",
+        iconStyle: "violet",
+        title: "AI og salgsfunnel-gjennomgang",
+        subtitle: "Nettside, leadfangst, kundereise og oppfølging",
+        duration: 60,
+        durationLabel: "60 min",
+        price: "€195",
+        priceNote: "betalt gjennomgang",
+        paid: true,
+        format: "Google Meet",
+        blurb: "Vi går gjennom hvordan du får leads i dag, hva som skjer etter første kontakt, og hvor AI kan forbedre salgsprosessen.",
+        cta: "Book funnel-gjennomgang",
+        intakeTitle: "Skjema før funnel-gjennomgang",
+        intakeFields: CHATGENIUS_AI_FIELDS,
+      },
+      {
+        id: "chat-chatbot-workshop",
+        icon: "Briefcase",
+        iconStyle: "violet",
+        title: "AI chatbot / kundedialog workshop",
+        subtitle: "For deg som vurderer chatbot, AI-assistent eller automatisert kundeservice",
+        duration: 60,
+        durationLabel: "60 min",
+        price: "€195",
+        priceNote: "betalt workshop",
+        paid: true,
+        format: "Google Meet",
+        blurb: "For deg som vil se hvordan en AI-assistent kan svare kunder, kvalifisere leads, booke møter og følge opp henvendelser.",
+        cta: "Book AI chatbot-samtale",
+        intakeTitle: "Skjema før chatbot-workshop",
+        intakeFields: CHATGENIUS_AI_FIELDS,
       },
     ],
     crossLinks: [
