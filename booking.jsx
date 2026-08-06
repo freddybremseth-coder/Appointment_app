@@ -502,6 +502,21 @@ function BookingApp() {
   }, []);
 
   useEffect(() => {
+    if (window.parent === window) return;
+    const postHeight = () => {
+      window.parent.postMessage({ type: "appt-embed-height", height: document.documentElement.scrollHeight }, "*");
+    };
+    postHeight();
+    const observer = new ResizeObserver(postHeight);
+    observer.observe(document.body);
+    window.addEventListener("resize", postHeight);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", postHeight);
+    };
+  }, []);
+
+  useEffect(() => {
     const clientId = String(window.GOOGLE_CLIENT_ID || "").trim();
     if (!clientId) {
       setGoogleStatus({ type: "error", message: "Google Client ID mangler." });
