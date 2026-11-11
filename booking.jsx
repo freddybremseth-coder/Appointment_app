@@ -254,7 +254,11 @@ function MiniCal({ year, month, selected, onPick, onMonth }) {
       <div className="cal-grid">
         {cells.map((c, i) => {
           const sel = selected && c.cur && c.d === selected.d && month === selected.m && year === selected.y;
-          const avail = c.cur && c.d >= 11 && c.d <= 22 && (i % 7) !== 5 && (i % 7) !== 6;
+          const candidate = new Date(year, month, c.d);
+          const firstAllowed = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          const lastAllowed = new Date(firstAllowed);
+          lastAllowed.setDate(lastAllowed.getDate() + 90);
+          const avail = c.cur && (i % 7) < 5 && candidate >= firstAllowed && candidate <= lastAllowed;
           return (
             <button
               key={i}
@@ -464,9 +468,12 @@ function BookingApp() {
 
   const initialService = getInitialService(brand);
   const [serviceId, setServiceId] = useState(initialService.id);
-  const [date, setDate] = useState({ d: 13, m: 4, y: 2026 });
-  const [time, setTime] = useState("10:00");
-  const [calMonth, setCalMonth] = useState({ m: 4, y: 2026 });
+  const [date, setDate] = useState(null);
+  const [time, setTime] = useState("");
+  const [calMonth, setCalMonth] = useState(() => {
+    const today = new Date();
+    return { m: today.getMonth(), y: today.getFullYear() };
+  });
   const [contact, setContact] = useState({ name: "", email: "", phone: "" });
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -588,7 +595,7 @@ function BookingApp() {
   const availabilityUrl = getAvailabilityUrl();
   const availableTimes = useMemo(() => {
     const allTimes = [...TIMES_AM, ...TIMES_PM];
-    return allTimes.filter(t => !isTimeBlocked(t, service.duration, busySlots, date));
+    return date ? allTimes.filter(t => !isTimeBlocked(t, service.duration, busySlots, date)) : [];
   }, [busySlots, date, service.duration]);
   const dateLabel = date
     ? `${["søndag","mandag","tirsdag","onsdag","torsdag","fredag","lørdag"][new Date(date.y, date.m, date.d).getDay()]} ${date.d}. ${MONTHS_NO[date.m]} ${date.y}`
@@ -653,7 +660,7 @@ function BookingApp() {
   };
 
   const submitBooking = () => {
-    if (!detailsReady || submitted) return;
+    if (!detailsReady || !date || !time || submitted) return;
     const saved = BookingStore.create({
       brandId: brand.id,
       brandName: brand.siteName,
@@ -690,7 +697,7 @@ function BookingApp() {
           <div className="sec-split">
             <section className="sec sec-cal">
               <h2 className="h-section">2. Velg en dato</h2>
-              <MiniCal year={calMonth.y} month={calMonth.m} selected={date} onPick={setDate} onMonth={monthShift}/>
+              <MiniCal year={calMonth.y} month={calMonth.m} selected={date} onPick={nextDate => { setDate(nextDate); setTime(""); }} onMonth={monthShift}/>
               <div className="tz-note">
                 <Icon.Globe/>
                 <span>Tidssone: Europa/Madrid (CET)</span>
@@ -717,7 +724,7 @@ function BookingApp() {
                 Ved å fortsette godtar du våre <a href="#">personvernvilkår</a> og <a href="#">brukervilkår</a>.
               </div>
 
-              <button className="btn-primary" disabled={!detailsReady} onClick={submitBooking}>
+              <button className="btn-primary" disabled={!detailsReady || !date || !time} onClick={submitBooking}>
                 {service.cta}
               </button>
             </>
